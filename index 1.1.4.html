@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pikmin Syllable Garden Expedition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --garden-sky: #E0F2FE;
+      --meadow-green: #ECFDF5;
+      --pikmin-red: #EF4444;
+      --pikmin-yellow: #F59E0B;
+      --pikmin-blue: #2563EB;
+      --leaf-green: #10B981;
+      --leaf-dark: #047857;
+      --petal-pink: #F43F5E;
+      --nectar-gold: #FBBF24;
+      --flower-white: #FFFFFF;
+      --clay-brown: #78350F;
+      --card-bg: #FFFFFF;
+      --text-main: #1E293B;
+      --text-muted: #64748B;
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --shadow: 0 12px 28px -6px rgba(16, 185, 129, 0.15), 0 8px 12px -6px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka', 'Quicksand', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background: linear-gradient(180deg, #BAE6FD 0%, #E8F5E9 45%, #D1FAE5 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: var(--text-main);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Decorative background drifting foliage */
+    .bg-leaf {
+      position: absolute;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Pikmin Mascot Header Display */
+    .mascot-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: -16px;
+      position: relative;
+      z-index: 15;
+    }
+
+    .pikmin-svg {
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+      transform-origin: bottom center;
+      animation: pikminBob 3s ease-in-out infinite;
+    }
+
+    .pikmin-red { animation-delay: 0s; }
+    .pikmin-yellow { animation-delay: 0.8s; }
+    .pikmin-blue { animation-delay: 1.6s; }
+
+    @keyframes pikminBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    @keyframes leafSway {
+      0%, 100% { transform: rotate(-5deg); }
+      50% { transform: rotate(10deg); }
+    }
+
+    .swaying-stem {
+      transform-origin: 50% 30%;
+      animation: leafSway 2.5s ease-in-out infinite alternate;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      font-weight: 600;
+      border: 2px solid #A7F3D0;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #ECFDF5;
+      color: var(--leaf-dark);
+      border-radius: 999px;
+      font-size: 0.95rem;
+      border: 1.5px solid #6EE7B7;
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--leaf-dark);
+      cursor: pointer;
+      font-size: 0.85rem;
+      text-decoration: underline;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    .btn-teacher {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1.5px solid #FCD34D;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-teacher:hover {
+      background: #FDE68A;
+      transform: translateY(-1px);
+    }
+
+    /* Garden Main Card */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      padding: 36px 26px 28px 26px;
+      box-shadow: 0 16px 36px -8px rgba(16, 185, 129, 0.2);
+      text-align: center;
+      position: relative;
+      border: 4px solid #6EE7B7;
+    }
+
+    /* Garden Growth Progress Bar */
+    .progress-bar-container {
+      width: 100%;
+      height: 14px;
+      background: #E5E7EB;
+      border-radius: 999px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      border: 2px solid #D1D5DB;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #34D399, #10B981, #059669);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .question-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--leaf-dark);
+      background: #D1FAE5;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 10px;
+    }
+
+    .word-text {
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: #064E3B;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      text-shadow: 0 2px 4px rgba(6, 78, 59, 0.08);
+    }
+
+    /* Audio Actions */
+    .audio-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn-audio {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      border: none;
+      padding: 12px 26px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 1.15rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+      transition: all 0.15s ease;
+    }
+
+    .btn-audio:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
+    }
+
+    /* Syllable Options (Pikmin Garden Buttons) */
+    .choices-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .choice-btn {
+      background: #F9FAFB;
+      border: 3px solid #E5E7EB;
+      border-radius: var(--radius-md);
+      padding: 16px 12px;
+      cursor: pointer;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #374151;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: #ECFDF5;
+      border-color: #6EE7B7;
+      transform: translateY(-3px);
+    }
+
+    .choice-btn .bloom-icons {
+      font-size: 1.3rem;
+      letter-spacing: 2px;
+    }
+
+    .choice-btn.selected-correct {
+      background: #D1FAE5 !important;
+      border-color: #10B981 !important;
+      color: #065F46 !important;
+      animation: pikminVictory 0.5s ease;
+    }
+
+    .choice-btn.selected-wrong {
+      background: #FEE2E2 !important;
+      border-color: #EF4444 !important;
+      color: #991B1B !important;
+      animation: shake 0.4s ease;
+    }
+
+    .choice-btn.is-correct-target {
+      background: #D1FAE5 !important;
+      border-color: #10B981 !important;
+      color: #065F46 !important;
+    }
+
+    .choice-btn:disabled {
+      cursor: default;
+    }
+
+    /* Syllable Chips Breakdown (Visual only) */
+    .syllable-chips {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: #ECFDF5;
+      color: #047857;
+      border: 2px solid #6EE7B7;
+      padding: 8px 20px;
+      border-radius: 999px;
+      font-size: 1.4rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      cursor: default;
+    }
+
+    .explanation-box {
+      background: #F0FDF4;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin: 18px 0;
+      border: 2px dashed #34D399;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .explanation-box.show {
+      display: block;
+    }
+
+    /* Next Button (Manual Advance) */
+    .btn-next {
+      background: linear-gradient(135deg, #F59E0B, #D97706);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: var(--radius-md);
+      font-size: 1.3rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .btn-next:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(245, 158, 11, 0.5);
+    }
+
+    .btn-next.show {
+      display: inline-flex;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 78, 59, 0.6);
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 4px solid #6EE7B7;
+      position: relative;
+    }
+
+    .id-display {
+      letter-spacing: 12px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: #F0FDF4;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      border: 2px solid #A7F3D0;
+      margin: 16px 0;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #064E3B;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .key-btn {
+      background: #F9FAFB;
+      border: 2px solid #E5E7EB;
+      border-radius: var(--radius-md);
+      padding: 14px 0;
+      font-size: 1.4rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #374151;
+    }
+
+    .key-btn:hover {
+      background: #D1FAE5;
+      border-color: #6EE7B7;
+    }
+
+    .btn-primary-start {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-size: 1.25rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-primary-start:disabled {
+      background: #9CA3AF;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    /* Teacher Portal Modal */
+    .teacher-modal-box {
+      max-width: 740px;
+      text-align: left;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      border-color: #FCD34D;
+    }
+
+    .teacher-tabs {
+      display: flex;
+      gap: 8px;
+      margin: 14px 0 10px 0;
+      border-bottom: 2px solid #E5E7EB;
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 8px 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .tab-btn.active {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .teacher-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: #F0FDF4;
+      border: 1px solid #A7F3D0;
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #047857;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .table-container {
+      overflow-y: auto;
+      max-height: 280px;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      margin-bottom: 14px;
+    }
+
+    table.roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    table.roster-table th {
+      background: #F3F4F6;
+      padding: 10px 12px;
+      font-weight: 700;
+      color: #4B5563;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    table.roster-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    table.roster-table tr:hover td {
+      background: #F0FDF4;
+    }
+
+    .teacher-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: auto;
+      padding-top: 10px;
+    }
+
+    .btn-secondary {
+      background: #E5E7EB;
+      color: #374151;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-export {
+      background: #059669;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 18px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    /* Results Screen */
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      text-align: left;
+      margin: 18px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .review-item {
+      background: #F0FDF4;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #A7F3D0;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .review-item:hover {
+      background: #D1FAE5;
+    }
+
+    .sync-indicator {
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #9CA3AF;
+    }
+    .sync-dot.active { background: #10B981; }
+
+    /* Animations */
+    @keyframes pikminVictory {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.1) translateY(-6px); }
+      70% { transform: scale(0.95); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+  <!-- Background Decorative Foliage -->
+  <div class="bg-leaf" style="top: 8%; left: 4%; font-size: 3rem;">🌱</div>
+  <div class="bg-leaf" style="top: 15%; right: 6%; font-size: 3.5rem;">🌸</div>
+  <div class="bg-leaf" style="bottom: 12%; left: 8%; font-size: 4rem;">🍃</div>
+  <div class="bg-leaf" style="bottom: 10%; right: 8%; font-size: 3.2rem;">🌼</div>
+
+  <div class="container">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div>
+        <span class="badge" id="studentBadge">🌱 Explorer: #00000</span>
+        <button class="btn-text" onclick="showLoginModal()">Switch ID</button>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <span class="badge" style="background:#FEF3C7; color:#92400E; border-color:#FCD34D;" id="highScoreBadge">
+          🌸 Blooms: 0/12
+        </span>
+        <button class="btn-teacher" onclick="openTeacherAuthModal()">
+          <span>👩‍🏫</span> Teacher
+        </button>
+      </div>
+    </div>
+
+    <!-- Pikmin Mascots Peeking Over the Card -->
+    <div class="mascot-row">
+      <!-- Blue Pikmin (Flower) -->
+      <svg class="pikmin-svg pikmin-blue" width="55" height="75" viewBox="0 0 60 85">
+        <!-- Stem & Flower -->
+        <g class="swaying-stem">
+          <path d="M30 35 Q32 15 30 10" stroke="#047857" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- White 5-petal flower with yellow center -->
+          <circle cx="30" cy="8" r="4.5" fill="#FFFFFF"/>
+          <circle cx="24" cy="10" r="4" fill="#FFFFFF"/>
+          <circle cx="36" cy="10" r="4" fill="#FFFFFF"/>
+          <circle cx="26" cy="4" r="4" fill="#FFFFFF"/>
+          <circle cx="34" cy="4" r="4" fill="#FFFFFF"/>
+          <circle cx="30" cy="8" r="2.5" fill="#FBBF24"/>
+        </g>
+        <!-- Body -->
+        <ellipse cx="30" cy="55" rx="14" ry="18" fill="#2563EB"/>
+        <!-- Eyes -->
+        <circle cx="24" cy="48" r="4.5" fill="#FFFFFF"/>
+        <circle cx="24" cy="48" r="2.2" fill="#1E293B"/>
+        <circle cx="36" cy="48" r="4.5" fill="#FFFFFF"/>
+        <circle cx="36" cy="48" r="2.2" fill="#1E293B"/>
+        <!-- Gills/Mouth -->
+        <ellipse cx="30" cy="59" rx="3.5" ry="2" fill="#FFFFFF"/>
+      </svg>
+
+      <!-- Red Pikmin (Leaf + Pointy Nose) -->
+      <svg class="pikmin-svg pikmin-red" width="65" height="85" viewBox="0 0 60 90">
+        <!-- Stem & Leaf -->
+        <g class="swaying-stem">
+          <path d="M30 36 Q28 16 30 10" stroke="#047857" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <path d="M30 10 C20 4 25 -2 36 2 C37 8 34 11 30 10 Z" fill="#10B981"/>
+        </g>
+        <!-- Body -->
+        <ellipse cx="30" cy="58" rx="15" ry="20" fill="#EF4444"/>
+        <!-- Eyes -->
+        <circle cx="23" cy="50" r="5" fill="#FFFFFF"/>
+        <circle cx="23" cy="50" r="2.4" fill="#1E293B"/>
+        <circle cx="37" cy="50" r="5" fill="#FFFFFF"/>
+        <circle cx="37" cy="50" r="2.4" fill="#1E293B"/>
+        <!-- Iconic pointy nose -->
+        <polygon points="30,52 38,56 30,58" fill="#DC2626"/>
+      </svg>
+
+      <!-- Yellow Pikmin (Bud + Big Ears) -->
+      <svg class="pikmin-svg pikmin-yellow" width="60" height="78" viewBox="0 0 70 85">
+        <!-- Stem & Bud -->
+        <g class="swaying-stem">
+          <path d="M35 34 Q38 18 35 12" stroke="#047857" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <ellipse cx="35" cy="10" rx="4" ry="5.5" fill="#F43F5E"/>
+        </g>
+        <!-- Big Ears -->
+        <ellipse cx="14" cy="53" rx="7" ry="11" fill="#F59E0B" transform="rotate(-25 14 53)"/>
+        <ellipse cx="56" cy="53" rx="7" ry="11" fill="#F59E0B" transform="rotate(25 56 53)"/>
+        <!-- Body -->
+        <ellipse cx="35" cy="54" rx="15" ry="18" fill="#F59E0B"/>
+        <!-- Eyes -->
+        <circle cx="28" cy="48" r="4.5" fill="#FFFFFF"/>
+        <circle cx="28" cy="48" r="2.2" fill="#1E293B"/>
+        <circle cx="42" cy="48" r="4.5" fill="#FFFFFF"/>
+        <circle cx="42" cy="48" r="2.2" fill="#1E293B"/>
+      </svg>
+    </div>
+
+    <!-- Main Game Card -->
+    <div class="card" id="gameCard">
+      
+      <!-- Garden Growth Bar -->
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+
+      <div class="question-tag" id="questionCounter">
+        🌱 Expedition Word 1 of 12
+      </div>
+
+      <div class="word-text" id="targetWord">classroom</div>
+
+      <!-- Single Natural Audio Listen Button -->
+      <div class="audio-actions">
+        <button class="btn-audio" onclick="speakCurrentWord()">
+          <span>🔊</span> Listen Word
+        </button>
+      </div>
+
+      <!-- Syllable Choices (1-4 Garden Blooms) -->
+      <div class="choices-grid" id="choicesGrid">
+        <button class="choice-btn" onclick="submitAnswer(1)">
+          <span>1 Syllable</span>
+          <span class="bloom-icons">🌱</span>
+        </button>
+        <button class="choice-btn" onclick="submitAnswer(2)">
+          <span>2 Syllables</span>
+          <span class="bloom-icons">🌿🌿</span>
+        </button>
+        <button class="choice-btn" onclick="submitAnswer(3)">
+          <span>3 Syllables</span>
+          <span class="bloom-icons">🌸🌸🌸</span>
+        </button>
+        <button class="choice-btn" onclick="submitAnswer(4)">
+          <span>4 Syllables</span>
+          <span class="bloom-icons">🌺🌺🌺🌺</span>
+        </button>
+      </div>
+
+      <!-- Syllable Breakdown Box (Visual only) -->
+      <div class="explanation-box" id="explanationBox">
+        <div style="font-size: 0.95rem; font-weight: 700; color: #047857; margin-bottom: 6px;">
+          🌿 Syllable Sprout Breakdown:
+        </div>
+        <div class="syllable-chips" id="syllableChips"></div>
+        <div id="feedbackText" style="font-size: 1.15rem; font-weight: 700; margin-top: 8px;"></div>
+      </div>
+
+      <!-- Explicit Manual Advance -->
+      <button class="btn-next" id="nextBtn" onclick="handleNextClick()">
+        Next Word ➔
+      </button>
+    </div>
+
+    <!-- Results Card -->
+    <div class="card" id="resultsCard" style="display: none;">
+      <div style="font-size: 3rem; margin-bottom: 4px;">🌸🌺🌼</div>
+      <h2 style="font-size: 2.2rem; color: #064E3B; margin-bottom: 6px;">Expedition Complete!</h2>
+      <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 8px;">All your Pikmin sprouts are fully bloomed!</p>
+      
+      <!-- Confirmation of Sync -->
+      <div class="sync-indicator" id="resultsSyncStatus">
+        <span class="sync-dot active"></span> Saved to ID &nbsp;•&nbsp; <span id="cloudStatusText">☁️ Syncing to Teacher Google Sheet...</span>
+      </div>
+
+      <div style="font-size: 2.5rem; font-weight: 700; color: #047857; margin: 12px 0;" id="finalScoreDisplay">
+        🌸 12 / 12 Blooms
+      </div>
+      <div id="newBestBadge" style="display:none; color:#10B981; font-weight:700; font-size:1.1rem; margin-bottom:12px;">
+        ✨ New Personal Best Garden Record! ✨
+      </div>
+
+      <div style="font-weight: 700; text-align: left; color:#064E3B; margin-top: 14px;">Garden Word Review (Tap to listen):</div>
+      <div class="review-grid" id="reviewList"></div>
+
+      <div style="display: flex; gap: 12px; margin-top: 18px;">
+        <button class="btn-primary-start" onclick="restartGame()">Start New Expedition 🔄</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student ID Login Modal -->
+  <div class="modal-overlay" id="loginModal" style="display: none;">
+    <div class="modal-box">
+      <div style="font-size: 2.5rem; margin-bottom: 4px;">🌱</div>
+      <h3 style="font-size: 1.6rem; color: #064E3B; margin-bottom: 4px;">Pikmin Explorer Login</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">Enter your 5-digit Student ID to start planting.</p>
+      
+      <div class="id-display" id="idDisplay">_____</div>
+
+      <div class="keypad">
+        <button class="key-btn" onclick="typeDigit('1')">1</button>
+        <button class="key-btn" onclick="typeDigit('2')">2</button>
+        <button class="key-btn" onclick="typeDigit('3')">3</button>
+        <button class="key-btn" onclick="typeDigit('4')">4</button>
+        <button class="key-btn" onclick="typeDigit('5')">5</button>
+        <button class="key-btn" onclick="typeDigit('6')">6</button>
+        <button class="key-btn" onclick="typeDigit('7')">7</button>
+        <button class="key-btn" onclick="typeDigit('8')">8</button>
+        <button class="key-btn" onclick="typeDigit('9')">9</button>
+        <button class="key-btn" onclick="clearDigit()" style="color:var(--pikmin-red);">⌫</button>
+        <button class="key-btn" onclick="typeDigit('0')">0</button>
+        <button class="key-btn" onclick="randomDemoId()" style="font-size:0.9rem; color:#059669;">Demo</button>
+      </div>
+
+      <button class="btn-primary-start" id="loginBtn" disabled onclick="saveStudentId()">Start Garden Challenge 🌱</button>
+    </div>
+  </div>
+
+  <!-- Teacher PIN Auth Modal -->
+  <div class="modal-overlay" id="teacherAuthModal" style="display: none;">
+    <div class="modal-box">
+      <button class="close-btn" onclick="closeModals()">✕</button>
+      <h3 style="font-size: 1.4rem; margin-bottom: 6px;">Teacher Verification 🔒</h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        Enter Teacher PIN to open settings and gradebook.<br><small>(Default PIN: <b>1234</b>)</small>
+      </p>
+      
+      <input type="password" id="teacherPinInput" maxlength="6" placeholder="PIN" 
+             style="font-size: 1.8rem; text-align: center; letter-spacing: 8px; width: 160px; padding: 8px; border-radius: 12px; border: 2px solid #CBD5E1; margin-bottom: 16px;">
+      
+      <div id="pinError" style="color: var(--pikmin-red); font-size: 0.9rem; margin-bottom: 12px; display: none;">
+        Incorrect PIN. Please try again.
+      </div>
+
+      <button class="btn-primary-start" onclick="verifyTeacherPin()">Unlock Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Teacher Gradebook & Cloud Settings Modal -->
+  <div class="modal-overlay" id="teacherDashboardModal" style="display: none;">
+    <div class="modal-box teacher-modal-box">
+      <button class="close-btn" onclick="closeModals()">✕</button>
+      
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <h3 style="font-size: 1.4rem; color: #92400E;">👩‍🏫 Teacher Portal & Gradebook</h3>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="teacher-tabs">
+        <button class="tab-btn active" id="tabRosterBtn" onclick="switchTeacherTab('roster')">📊 Class Roster</button>
+        <button class="tab-btn" id="tabSettingsBtn" onclick="switchTeacherTab('settings')">⚙️ Google Sheet Sync</button>
+      </div>
+
+      <!-- Tab 1: Roster View -->
+      <div id="rosterTabView">
+        <div class="teacher-stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="statTotalStudents">0</div>
+            <div class="stat-label">Explorers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statAvgScore">0.0</div>
+            <div class="stat-label">Class Avg</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="statPerfectScores">0</div>
+            <div class="stat-label">12/12 Blooms</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <input type="text" id="rosterSearch" placeholder="🔍 Search Student ID..." 
+                 oninput="filterRoster()"
+                 style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid #CBD5E1; font-size: 0.9rem;">
+        </div>
+
+        <div class="table-container">
+          <table class="roster-table">
+            <thead>
+              <tr>
+                <th>Student ID</th>
+                <th>Best</th>
+                <th>Latest</th>
+                <th>Plays</th>
+                <th>Last Active</th>
+              </tr>
+            </thead>
+            <tbody id="rosterTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="teacher-actions">
+          <button class="btn-secondary" onclick="clearAllScoresConfirm()" style="color: #991B1B; font-size: 0.8rem;">
+            🗑️ Clear Local
+          </button>
+          <button class="btn-export" onclick="exportToCSV()">
+            <span>📥</span> Download CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 2: Google Sheets Setup -->
+      <div id="settingsTabView" style="display: none; font-size: 0.95rem;">
+        <p style="color: var(--text-muted); margin-bottom: 12px;">
+          Sync student scores to your Google Sheet automatically whenever they finish a round.
+        </p>
+
+        <label style="font-weight: 700; display: block; margin-bottom: 6px;">Google Apps Script Web App URL:</label>
+        <input type="text" id="sheetUrlInput" placeholder="https://script.google.com/macros/s/.../exec"
+               style="width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid #CBD5E1; font-size: 0.85rem; margin-bottom: 12px;">
+
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button class="btn-primary-start" style="padding: 10px;" onclick="saveSheetUrl()">Save URL</button>
+          <button class="btn-secondary" onclick="sendTestScore()">Send Test Row 🧪</button>
+        </div>
+
+        <div style="background: #F8FAFC; padding: 12px; border-radius: 10px; border: 1px solid #E2E8F0; font-size: 0.85rem; color: #475569;">
+          <b>Quick Checklist:</b>
+          <ol style="margin-left: 20px; margin-top: 4px; line-height: 1.4;">
+            <li>Deploy Apps Script as <b>Web app</b>.</li>
+            <li>Set <i>"Who has access"</i> to <b>Anyone</b>.</li>
+            <li>Paste your URL above and click Save.</li>
+          </ol>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // 1. DATA WITH CHUNK BREAKDOWNS
+    // -------------------------------------------------------------
+    const WORD_BANK = [
+      { word: "pen", syllables: 1, displaySyllables: ["pen"] },
+      { word: "tall", syllables: 1, displaySyllables: ["tall"] },
+      { word: "classroom", syllables: 2, displaySyllables: ["class", "room"] },
+      { word: "happy", syllables: 2, displaySyllables: ["hap", "py"] },
+      { word: "teacher", syllables: 2, displaySyllables: ["teach", "er"] },
+      { word: "yellow", syllables: 2, displaySyllables: ["yel", "low"] },
+      { word: "beautiful", syllables: 3, displaySyllables: ["beau", "ti", "ful"] },
+      { word: "hamburger", syllables: 3, displaySyllables: ["ham", "bur", "ger"] },
+      { word: "seventeen", syllables: 3, displaySyllables: ["sev", "en", "teen"] },
+      { word: "eraser", syllables: 3, displaySyllables: ["e", "ra", "ser"] },
+      { word: "supermarket", syllables: 4, displaySyllables: ["su", "per", "mar", "ket"] },
+      { word: "alligator", syllables: 4, displaySyllables: ["al", "li", "ga", "tor"] }
+    ];
+
+    // -------------------------------------------------------------
+    // 2. STATE & HYBRID STORAGE
+    // -------------------------------------------------------------
+    const TEACHER_PIN = "1234";
+    let studentId = "";
+    let studentHighScore = 0;
+    let questions = [];
+    let currentIndex = 0;
+    let currentScore = 0;
+    let isAnswered = false;
+    let typedId = "";
+    let rosterData = {};
+
+    function getSheetUrl() {
+      return localStorage.getItem("syllables_sheet_url") || "";
+    }
+
+    function loadRosterData() {
+      try {
+        const stored = localStorage.getItem("syllables_roster_data");
+        rosterData = stored ? JSON.parse(stored) : {};
+      } catch (e) {
+        rosterData = {};
+      }
+    }
+
+    function saveRosterRecord(id, score) {
+      loadRosterData();
+      const existing = rosterData[id] || { bestScore: 0, latestScore: 0, attempts: 0, lastActive: "" };
+      const newBest = Math.max(existing.bestScore, score);
+      const now = new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      rosterData[id] = {
+        bestScore: newBest,
+        latestScore: score,
+        attempts: existing.attempts + 1,
+        lastActive: now
+      };
+
+      localStorage.setItem("syllables_roster_data", JSON.stringify(rosterData));
+      localStorage.setItem(`syllables_high_${id}`, newBest);
+    }
+
+    // Silent Cloud Sync to Google Sheet
+    async function syncScoreToGoogleSheet(id, score, total = 12) {
+      const url = getSheetUrl();
+      const cloudStatusEl = document.getElementById("cloudStatusText");
+
+      if (!url) {
+        if (cloudStatusEl) cloudStatusEl.innerText = "☁️ Google Sheet URL not configured";
+        return;
+      }
+
+      if (cloudStatusEl) cloudStatusEl.innerText = "☁️ Syncing to Teacher Google Sheet...";
+
+      try {
+        await fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            studentId: id,
+            score: score,
+            total: total
+          })
+        });
+        if (cloudStatusEl) cloudStatusEl.innerText = "☁️ Synced to Google Sheet! ✓";
+      } catch (err) {
+        if (cloudStatusEl) cloudStatusEl.innerText = "☁️ Offline (Saved locally)";
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 3. AUDIO ENGINE & SYNTHESIS (WHOLE WORD ONLY)
+    // -------------------------------------------------------------
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    // Gentle nature/garden bell chime
+    function playChime(isCorrect) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (isCorrect) {
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5
+          gain.gain.setValueAtTime(0.35, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.4);
+        } else {
+          // Soft little droplet plop
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(260, ctx.currentTime);
+          osc.frequency.linearRampToValueAtTime(180, ctx.currentTime + 0.22);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.22);
+        }
+      } catch (e) {}
+    }
+
+    let availableVoices = [];
+    function loadVoices() { availableVoices = window.speechSynthesis.getVoices(); }
+    if (window.speechSynthesis) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function getBestNativeVoice() {
+      if (!availableVoices.length) loadVoices();
+      const preferred = availableVoices.find(v => 
+        (v.name.includes("Google") || v.name.includes("Natural") || v.name.includes("Samantha") || v.name.includes("Ava")) &&
+        (v.lang.startsWith("en-US") || v.lang.startsWith("en-GB"))
+      );
+      return preferred || availableVoices.find(v => v.lang.startsWith("en")) || null;
+    }
+
+    function speakCurrentWord() {
+      const q = questions[currentIndex];
+      if (!q || !window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(q.word);
+      utter.rate = 0.88;
+      utter.pitch = 1.05;
+      const v = getBestNativeVoice();
+      if (v) utter.voice = v;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // -------------------------------------------------------------
+    // 4. GAMEPLAY LOGIC
+    // -------------------------------------------------------------
+    function initGame() {
+      questions = [...WORD_BANK].sort(() => Math.random() - 0.5);
+      currentIndex = 0;
+      currentScore = 0;
+      loadCard();
+    }
+
+    function loadCard() {
+      isAnswered = false;
+      const q = questions[currentIndex];
+
+      document.getElementById("questionCounter").innerText = `🌱 Expedition Word ${currentIndex + 1} of 12`;
+      document.getElementById("progressBar").style.width = `${((currentIndex) / 12) * 100}%`;
+      document.getElementById("targetWord").innerText = q.word;
+
+      const buttons = document.querySelectorAll(".choice-btn");
+      buttons.forEach(btn => {
+        btn.className = "choice-btn";
+        btn.disabled = false;
+      });
+
+      // Syllable chips (visual only)
+      const chipsContainer = document.getElementById("syllableChips");
+      chipsContainer.innerHTML = "";
+      q.displaySyllables.forEach((syl) => {
+        const chip = document.createElement("div");
+        chip.className = "chip";
+        chip.textContent = syl;
+        chipsContainer.appendChild(chip);
+      });
+
+      document.getElementById("explanationBox").classList.remove("show");
+      document.getElementById("feedbackText").innerHTML = "";
+      const nextBtn = document.getElementById("nextBtn");
+      nextBtn.classList.remove("show");
+      nextBtn.innerText = (currentIndex === 11) ? "See Final Blooms 🏆" : "Next Word ➔";
+
+      setTimeout(() => speakCurrentWord(), 250);
+    }
+
+    function submitAnswer(chosenNumber) {
+      if (isAnswered) return;
+      isAnswered = true;
+
+      const q = questions[currentIndex];
+      const buttons = document.querySelectorAll(".choice-btn");
+      buttons.forEach(b => b.disabled = true);
+
+      const isCorrect = (chosenNumber === q.syllables);
+      const chosenButton = buttons[chosenNumber - 1];
+
+      if (isCorrect) {
+        currentScore++;
+        chosenButton.classList.add("selected-correct");
+        playChime(true);
+        document.getElementById("feedbackText").innerHTML = 
+          `<span style="color:#047857;">🌸 Bloomed! <b>"${q.word}"</b> has <b>${q.syllables}</b> syllable${q.syllables > 1 ? 's' : ''}!</span>`;
+      } else {
+        chosenButton.classList.add("selected-wrong");
+        buttons[q.syllables - 1].classList.add("is-correct-target");
+        playChime(false);
+        document.getElementById("feedbackText").innerHTML = 
+          `<span style="color:#B91C1C;">Nice sprout try! <b>"${q.word}"</b> has <b>${q.syllables}</b> syllable${q.syllables > 1 ? 's' : ''}.</span>`;
+      }
+
+      document.getElementById("explanationBox").classList.add("show");
+      document.getElementById("nextBtn").classList.add("show");
+    }
+
+    function handleNextClick() {
+      currentIndex++;
+      if (currentIndex < 12) {
+        loadCard();
+      } else {
+        showResults();
+      }
+    }
+
+    function showResults() {
+      document.getElementById("gameCard").style.display = "none";
+      const resultsCard = document.getElementById("resultsCard");
+      resultsCard.style.display = "block";
+
+      document.getElementById("finalScoreDisplay").innerText = `🌸 ${currentScore} / 12 Blooms`;
+      
+      const isNewBest = currentScore > studentHighScore;
+      if (isNewBest) {
+        studentHighScore = currentScore;
+        document.getElementById("newBestBadge").style.display = "block";
+      } else {
+        document.getElementById("newBestBadge").style.display = "none";
+      }
+
+      // 1. SAVE LOCALLY
+      if (studentId) {
+        saveRosterRecord(studentId, currentScore);
+      }
+      updateTopBar();
+
+      // 2. SYNC TO GOOGLE SHEET
+      syncScoreToGoogleSheet(studentId, currentScore, 12);
+
+      // Render review list
+      const reviewList = document.getElementById("reviewList");
+      reviewList.innerHTML = "";
+      WORD_BANK.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "review-item";
+        div.innerHTML = `
+          <span><b>${item.word}</b> (${item.displaySyllables.join(" • ")})</span>
+          <span style="font-weight:700; color:#047857;">[${item.syllables}] 🔊</span>
+        `;
+        div.onclick = () => {
+          const utter = new SpeechSynthesisUtterance(item.word);
+          utter.rate = 0.88;
+          const v = getBestNativeVoice();
+          if (v) utter.voice = v;
+          window.speechSynthesis.speak(utter);
+        };
+        reviewList.appendChild(div);
+      });
+    }
+
+    function restartGame() {
+      document.getElementById("resultsCard").style.display = "none";
+      showLoginModal();
+    }
+
+    // -------------------------------------------------------------
+    // 5. STUDENT ID SYSTEM (ALWAYS REQUIRED)
+    // -------------------------------------------------------------
+    function showLoginModal() {
+      typedId = "";
+      renderTypedId();
+      document.getElementById("loginModal").style.display = "flex";
+    }
+
+    function typeDigit(d) {
+      if (typedId.length < 5) {
+        typedId += d;
+        renderTypedId();
+      }
+    }
+
+    function clearDigit() {
+      typedId = typedId.slice(0, -1);
+      renderTypedId();
+    }
+
+    function randomDemoId() {
+      typedId = Math.floor(10000 + Math.random() * 90000).toString();
+      renderTypedId();
+    }
+
+    function renderTypedId() {
+      document.getElementById("idDisplay").innerText = typedId.padEnd(5, "_");
+      document.getElementById("loginBtn").disabled = typedId.length !== 5;
+    }
+
+    function saveStudentId() {
+      if (typedId.length === 5) {
+        studentId = typedId;
+        loadRosterData();
+        studentHighScore = (rosterData[studentId] && rosterData[studentId].bestScore) || 0;
+        updateTopBar();
+        document.getElementById("loginModal").style.display = "none";
+        document.getElementById("gameCard").style.display = "block";
+        initGame();
+      }
+    }
+
+    function updateTopBar() {
+      document.getElementById("studentBadge").innerText = `🌱 Explorer: #${studentId || '-----'}`;
+      document.getElementById("highScoreBadge").innerText = `🌸 Blooms: ${studentHighScore}/12`;
+    }
+
+    // -------------------------------------------------------------
+    // 6. TEACHER PORTAL & GOOGLE SHEET SETTINGS
+    // -------------------------------------------------------------
+    function openTeacherAuthModal() {
+      document.getElementById("teacherPinInput").value = "";
+      document.getElementById("pinError").style.display = "none";
+      document.getElementById("teacherAuthModal").style.display = "flex";
+    }
+
+    function verifyTeacherPin() {
+      const pin = document.getElementById("teacherPinInput").value;
+      if (pin === TEACHER_PIN) {
+        document.getElementById("teacherAuthModal").style.display = "none";
+        openTeacherDashboard();
+      } else {
+        document.getElementById("pinError").style.display = "block";
+      }
+    }
+
+    function openTeacherDashboard() {
+      loadRosterData();
+      renderRosterTable();
+      updateTeacherMetrics();
+      document.getElementById("sheetUrlInput").value = getSheetUrl();
+      switchTeacherTab('roster');
+      document.getElementById("teacherDashboardModal").style.display = "flex";
+    }
+
+    function switchTeacherTab(tab) {
+      if (tab === 'roster') {
+        document.getElementById("rosterTabView").style.display = "block";
+        document.getElementById("settingsTabView").style.display = "none";
+        document.getElementById("tabRosterBtn").classList.add("active");
+        document.getElementById("tabSettingsBtn").classList.remove("active");
+      } else {
+        document.getElementById("rosterTabView").style.display = "none";
+        document.getElementById("settingsTabView").style.display = "block";
+        document.getElementById("tabRosterBtn").classList.remove("active");
+        document.getElementById("tabSettingsBtn").classList.add("active");
+      }
+    }
+
+    function saveSheetUrl() {
+      const url = document.getElementById("sheetUrlInput").value.trim();
+      localStorage.setItem("syllables_sheet_url", url);
+      alert("Google Sheets Webhook URL saved successfully!");
+    }
+
+    function sendTestScore() {
+      const url = getSheetUrl();
+      if (!url) {
+        alert("Please paste your Google Apps Script URL first!");
+        return;
+      }
+      syncScoreToGoogleSheet("99999", 12, 12);
+      alert("Sent test record for ID #99999! Check your Google Sheet to confirm it appears.");
+    }
+
+    function updateTeacherMetrics() {
+      const ids = Object.keys(rosterData);
+      const totalStudents = ids.length;
+      let totalScoreSum = 0;
+      let perfectCount = 0;
+
+      ids.forEach(id => {
+        totalScoreSum += rosterData[id].bestScore;
+        if (rosterData[id].bestScore === 12) perfectCount++;
+      });
+
+      const avg = totalStudents > 0 ? (totalScoreSum / totalStudents).toFixed(1) : "0.0";
+      document.getElementById("statTotalStudents").innerText = totalStudents;
+      document.getElementById("statAvgScore").innerText = avg;
+      document.getElementById("statPerfectScores").innerText = perfectCount;
+    }
+
+    function renderRosterTable(filterText = "") {
+      const tbody = document.getElementById("rosterTableBody");
+      tbody.innerHTML = "";
+
+      const ids = Object.keys(rosterData).sort((a, b) => rosterData[b].bestScore - rosterData[a].bestScore);
+      const filtered = ids.filter(id => id.includes(filterText));
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:#94A3B8; padding:20px;">No student records found.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(id => {
+        const item = rosterData[id];
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><b style="color:#047857;">#${id}</b></td>
+          <td><span style="background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:999px; font-weight:700;">🌸 ${item.bestScore} / 12</span></td>
+          <td>${item.latestScore} / 12</td>
+          <td>${item.attempts}</td>
+          <td style="color:var(--text-muted); font-size:0.8rem;">${item.lastActive || "—"}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterRoster() {
+      const query = document.getElementById("rosterSearch").value.trim();
+      renderRosterTable(query);
+    }
+
+    function exportToCSV() {
+      loadRosterData();
+      const ids = Object.keys(rosterData);
+      if (ids.length === 0) {
+        alert("No student records to export yet!");
+        return;
+      }
+
+      let csv = "Student ID,Best Blooms,Max Possible,Latest Score,Total Attempts,Last Active Date\n";
+      ids.forEach(id => {
+        const item = rosterData[id];
+        csv += `"${id}",${item.bestScore},12,${item.latestScore},${item.attempts},"${item.lastActive}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `pikmin_syllable_scores_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function clearAllScoresConfirm() {
+      if (confirm("Are you sure you want to reset all local class scores?")) {
+        rosterData = {};
+        localStorage.removeItem("syllables_roster_data");
+        renderRosterTable();
+        updateTeacherMetrics();
+      }
+    }
+
+    function closeModals() {
+      document.getElementById("teacherAuthModal").style.display = "none";
+      document.getElementById("teacherDashboardModal").style.display = "none";
+    }
+
+    // -------------------------------------------------------------
+    // INITIALIZATION
+    // -------------------------------------------------------------
+    window.addEventListener("DOMContentLoaded", () => {
+      loadRosterData();
+      showLoginModal();
+    });
+  </script>
+</body>
+</html>
